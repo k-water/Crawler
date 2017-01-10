@@ -1,0 +1,84 @@
+<blockquote>
+<p>欢迎来访HCI第一次趣玩作业，本次作业主要是完成简易的ningx虚拟主机管理系统。所涉及的知识涵盖linux的基本管理命令、nginx/ftp服务器配置、简单的前端页面处理和后台逻辑。</p>
+</blockquote>
+<h3 id="Nginx知多少"><a href="#Nginx知多少" class="headerlink" title="Nginx知多少"></a>Nginx知多少</h3><p>Nginx是一款轻量级的Web 服务器/反向代理服务器及电子邮件（IMAP/POP3）代理服务器，并在一个BSD-like 协议下发行。由俄罗斯的程序设计师Igor Sysoev所开发，供俄国大型的入口网站及搜索引擎Rambler（俄文：Рамблер）使用。其特点是占有内存少，并发能力强，事实上nginx的并发能力确实在同类型的网页服务器中表现较好，中国大陆使用nginx网站用户有：百度、新浪、网易、腾讯等。【摘抄自百度百科】</p>
+<a id="more"></a>
+<ul>
+<li>官方网站：<a href="http://nginx.org" target="_blank" rel="external">http://nginx.org</a></li>
+<li>淘宝运维的nginx-book(<em>想深入了解的同学看这里</em>): <a href="https://github.com/taobao/nginx-book" target="_blank" rel="external">https://github.com/taobao/nginx-book</a></li>
+</ul>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><ul>
+<li><p>体验传送门(新浪云)：<a href="http://sinaapp.com/" target="_blank" rel="external">http://sinaapp.com/</a></p>
+</li>
+<li><p>概要：日常情况下我们经常把应用部署到公开于网络的服务器上，而应用通过IP或域名访问，但于IP（端口）的数量限制，我们不得不剑走偏锋使用共享IP的方式。于是虚拟主机技术横空出世，可以从一台网络服务器上分配出磁盘空间供用户放置站点、应用组件给不同的虚拟主机，提供必要的站点功能、数据存放和传输功能，因此一个IP（套接字）可以直接运行多个多个网络应用。类似于新浪云、西部数码等虚拟主机提供商如雨后春笋般拔地而起。</p>
+</li>
+</ul>
+<h3 id="设计目标"><a href="#设计目标" class="headerlink" title="设计目标"></a>设计目标</h3><ul>
+<li><p>一个可用的虚拟主机管理系统，可以添加/删除/修改/查看多个虚拟主机（只需支持静态文件服务器），同时生成一个账户（账号名+密码）对该主机进行管理。</p>
+</li>
+<li><p>每个虚拟主机对应一个域名和项目文件路径</p>
+</li>
+<li><p>每个虚拟主机所运行的项目文件路径（空间）由系统自动生成，选用ftp/svn/git其中一种代码部署方式控制</p>
+</li>
+</ul>
+<h3 id="举个栗子"><a href="#举个栗子" class="headerlink" title="举个栗子"></a>举个栗子</h3><p>以下介绍的服务器为HCI内部服务器，运行着HCI的官方网站、竞考网微信公众号后台、weinre调试服务器等应用，所有应用使用不同的域名和同一个套接字（IP+端口）。下面我们来简单分析nginx的配置文件。</p>
+<p>nginx.conf局部</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line"># nginx.conf局部</div><div class="line"># 添加虚拟主机配置文件目录</div><div class="line"></div><div class="line">http &#123;</div><div class="line"></div><div class="line">        ##</div><div class="line">        # Basic Settings</div><div class="line">        ##</div><div class="line"></div><div class="line">        sendfile on;</div><div class="line">        tcp_nopush on;</div><div class="line">        types_hash_max_size 2048;</div><div class="line">        server_names_hash_bucket_size 64;</div><div class="line">        # server_tokens off;</div><div class="line"></div><div class="line">        # server_names_hash_bucket_size 64;</div><div class="line">        # server_name_in_redirect off;</div><div class="line"></div><div class="line">        include /etc/nginx/mime.types;</div><div class="line">        default_type application/octet-stream;</div><div class="line"></div><div class="line">        ##</div><div class="line">        # Logging Settings</div><div class="line">        ##</div><div class="line"></div><div class="line">        access_log /var/log/nginx/access.log;</div><div class="line">        error_log /var/log/nginx/error.log;</div><div class="line"></div><div class="line">        ##</div><div class="line">        # Gzip Settings</div><div class="line">        ##</div><div class="line"></div><div class="line">        gzip on;</div><div class="line">        gzip_disable &quot;msie6&quot;;</div><div class="line"></div><div class="line">        # gzip_vary on;</div><div class="line">        # gzip_proxied any;</div><div class="line">        # gzip_comp_level 6;</div><div class="line">        # gzip_buffers 16 8k;</div><div class="line">        # gzip_http_version 1.1;</div><div class="line"></div><div class="line">        ##</div><div class="line">        # nginx-naxsi config</div><div class="line">        ##</div><div class="line">        # Uncomment it if you installed nginx-naxsi</div><div class="line">        ##</div><div class="line"></div><div class="line">        #include /etc/nginx/naxsi_core.rules;</div><div class="line"></div><div class="line">        ##</div><div class="line">        # nginx-passenger config</div><div class="line">        ##</div><div class="line">        # Uncomment it if you installed nginx-passenger</div><div class="line">        ##</div><div class="line"></div><div class="line">        #passenger_root /usr;</div><div class="line">        #passenger_ruby /usr/bin/ruby;</div><div class="line"></div><div class="line">        ##</div><div class="line">        # Virtual Host Configs</div><div class="line">        ##</div><div class="line"></div><div class="line">        include /etc/nginx/conf.d/*.conf;</div><div class="line">        include /etc/nginx/sites-enabled/*;</div><div class="line">        #===================================#</div><div class="line">        include /etc/nginx/vhosts/*;	# 添加虚拟主机配置文件目录</div><div class="line">        #===================================#</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>官网配置文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"># 官网配置（静态文件服务器+PHP）</div><div class="line"># /etc/nginx/sites-enabled/default</div><div class="line"></div><div class="line">#===============================</div><div class="line">#</div><div class="line">#       HCI Server</div><div class="line">#</div><div class="line">#================================</div><div class="line">upstream nodejs__upstream &#123;</div><div class="line">        server 127.0.0.1:3000;</div><div class="line">        keepalive 64;</div><div class="line">&#125;</div><div class="line">server &#123;</div><div class="line">        listen 80 default_server;</div><div class="line">        listen [::]:80 default_server ipv6only=on;</div><div class="line">        server_name localhost scauhci.org www.scauhci.org;</div><div class="line"></div><div class="line">        root /var/www/HCIWEB-SCAU/home;</div><div class="line">        index index.php index.html index.htm;</div><div class="line"></div><div class="line">        location / &#123;</div><div class="line">                try_files $uri $uri/ /index.php$is_args$args;</div><div class="line">                client_max_body_size    10m;</div><div class="line">                # proxy_pass http://localhost:3000;</div><div class="line">                # First attempt to serve request as file, then</div><div class="line">                # as directory, then fall back to displaying a 404.</div><div class="line">                # Uncomment to enable naxsi on this location</div><div class="line">                # include /etc/nginx/naxsi.rules</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        location ^~ /jingkao &#123;</div><div class="line">                proxy_pass http://nodejs__upstream;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        location ~ \.php$ &#123;</div><div class="line">                fastcgi_pass 127.0.0.1:9000;</div><div class="line">                fastcgi_index index.php;</div><div class="line">                fastcgi_param SCRIPT_FILENAME /etc/nginx/sites-enabled/default$fastcgi_script_name;</div><div class="line">                include /etc/nginx/fastcgi_params;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>虚拟主机目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># 虚拟主机目录</div><div class="line">106 Dec  6 06:17 jingkao.com.conf</div><div class="line">135 Dec 26 11:32 weinre.conf</div><div class="line">111 Dec 13 16:19 xsx.conf</div><div class="line">175 Jan 15 21:03 ypf.conf</div><div class="line">131 Dec 25 16:34 zsl.conf</div><div class="line">131 Dec 25 16:34 zsl.conf</div></pre></td></tr></table></figure></p>
+<p>虚拟主机实例：weinre服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"># weinre服务器</div><div class="line">server &#123;</div><div class="line">listen 80;</div><div class="line">server_name weinre.scauhci.com;</div><div class="line">location / &#123;</div><div class="line">		# 反向代理到服务器B的8080端口</div><div class="line">        proxy_pass http://192.168.100.4:8080;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>虚拟主机实例：用于本次作业的测试服务器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># 测试服务器</div><div class="line">server &#123;</div><div class="line">listen 80;</div><div class="line">server_name test1.scauhci.com;</div><div class="line">root /var/www/test;</div><div class="line">index index.html;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>应用列表(就不一一例举全部应用了)：</p>
+<ul>
+<li><a href="http://www.scauhci.org" target="_blank" rel="external">HCI官网</a></li>
+</ul>
+<p>运行在<code>http://www.scauhci.com/</code>和<code>http://121.201.58.180:80</code>上，项目文件路径为/var/www/HCIWEB-SCAU/home，假设此文件夹只能由FTP账户（账号名: hci，密码：hci_pass）使用ftp对<code>ftp://www.scauhci.com/hci_home/</code>进行读写。</p>
+<ul>
+<li><a href="http://test1.scauhci.com" target="_blank" rel="external">用于本次作业的测试服务器</a></li>
+</ul>
+<p>运行在<code>http://weinre.scauhci.com/</code>和<code>http://121.201.58.180:80</code>上，项目文件路径为/var/www/test，假设此文件夹只能由FTP账户（账号名: hci1，密码：hci1_pass）使用ftp对<code>ftp://www.scauhci.com/test/</code>进行读写。</p>
+<h3 id="设计思路和流程"><a href="#设计思路和流程" class="headerlink" title="设计思路和流程"></a>设计思路和流程</h3><ol>
+<li><p>熟悉Linux环境和Nginx的配置(需部分成员了解)</p>
+</li>
+<li><p>设计WEB管理系统，需简单的数据库保存虚拟主机的信息（域名、文件路径等）以及管理员信息（只设计一名管理员）</p>
+</li>
+<li><p>模拟管理虚拟主机，同时对vhosts文件进行文本分析，了解规则后可以进行虚拟主机的实际管理</p>
+</li>
+<li><p>如有余力可继续实现服务器性能参数的可视化（CPU占用率/内存使用情况/硬盘容量等）<br><img src="/img/hci/graph.png" alt="图形化监控"></p>
+</li>
+</ol>
+<h3 id="写几个可能遇到的问题"><a href="#写几个可能遇到的问题" class="headerlink" title="写几个可能遇到的问题"></a>写几个可能遇到的问题</h3><ol>
+<li><p>文件权限的问题：每个应用对应的路径（文件夹）是相对独立的，且只能由对应的用户进行读写</p>
+</li>
+<li><p>考虑到DNS服务器的复杂性问题，本次作业无须自己搭建DNS服务器，统一分配10个二级域名用于实验</p>
+</li>
+<li><p>nginx的平滑重载:<code>kill -HUP cat &#39;/usr/local/nginx/logs/nginx.pid&#39;</code>或者<code>nginx -s reload</code></p>
+</li>
+<li><p>ftp/svn/git 服务器的配置不再赘述，各位还请发挥自我学习能力搜集资料。</p>
+</li>
+</ol>
+<h3 id="技能列表"><a href="#技能列表" class="headerlink" title="技能列表"></a>技能列表</h3><ul>
+<li><p><a href="https://www.shiyanlou.com/courses/1" target="_blank" rel="external">Linux入门知识</a></p>
+</li>
+<li><p>ssh/ftp(或者svn/git)/nginx等服务器搭建和配置</p>
+</li>
+<li><p>nginx进阶配置</p>
+</li>
+<li><p>后端：简单的 数据库处理、文件处理、业务逻辑设计</p>
+</li>
+<li><p>前端：一个管理后台的页面/如有余力则设计可视化的性能监控图形界面</p>
+</li>
+<li><p>协作工具：git<a href="https://coding.net/git#" target="_blank" rel="external">(coding)</a>/<a href="http://teambition.com/" target="_blank" rel="external">teambition</a></p>
+</li>
+<li><p>规范化的开发流程：需求文档-&gt;原型设计-&gt;（设计图）-&gt;开发-&gt;测试-&gt;上线</p>
+</li>
+</ul>
+<h3 id="成果："><a href="#成果：" class="headerlink" title="成果："></a>成果：</h3><ul>
+<li><p>可展示和使用的虚拟主机管理系统</p>
+</li>
+<li><p>完整的源代码和文档</p>
+</li>
+</ul>
+<h3 id="后话"><a href="#后话" class="headerlink" title="后话"></a>后话</h3><p>本作业难度适中，但涉及的分支非常丰富，适于团队合作，期望各位能涉及多方面的技术，另外需要对项目有大局的思考方式。建议3-5人一组，可挑选一名13级的师兄/师姐作为指导。有任何问题可直接在<code>HCI@上有老下有小群</code>讨论。也可以在本文后面的评论框直接评论。</p>
+<p>（懒懒的很久不写博客，各路大侠见谅）</p>

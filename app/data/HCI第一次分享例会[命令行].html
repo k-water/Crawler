@@ -1,0 +1,34 @@
+<blockquote>
+<p>欢迎来访HCI第一次例会分享，今天小编（HCI-鹏飞）需要分享的是linux和windows命令行的基本命令以及技巧。</p>
+</blockquote>
+<h3 id="关于linux知多少"><a href="#关于linux知多少" class="headerlink" title="关于linux知多少"></a>关于linux知多少</h3><p>概要：开源、多用户多任务、支持多线程多CPU的操作系统（基于POSIX和UNIX），以网络为核心而设计，可以运行UNIX工具、应用程序和网络协议。Linux内核版本已经升级到4.3。(内核源代码Git仓库：<a href="https://git.kernel.org/)。" target="_blank" rel="external">https://git.kernel.org/)。</a><br>特性：强大的控制台和Linux终端环境以及桌面环境如GNOME, KDE, XFCE和 LXDE，稳定性高安全性较高。</p>
+<a id="more"></a>
+<p>应用场景：<br><img src="/img/linux/application.png" alt="应用场景"></p>
+<h3 id="言归正传，下面开始进入正题。开始讲解linux-局部windows的命令行"><a href="#言归正传，下面开始进入正题。开始讲解linux-局部windows的命令行" class="headerlink" title="言归正传，下面开始进入正题。开始讲解linux(局部windows的命令行)"></a>言归正传，下面开始进入正题。开始讲解linux(局部windows的命令行)</h3><ul>
+<li>用户管理</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">查看当前登录的用户名：who am i \ who mom likes</div><div class="line">添加用户：adduser hci</div><div class="line">修改密码：passwd</div><div class="line">用户组查询：groups [root](cat /etc/group)</div><div class="line">添加到组：usermod -G sudo hci</div><div class="line">删除用户：deluser hci --remove-home</div></pre></td></tr></table></figure>
+<ul>
+<li>文件管理</li>
+</ul>
+<blockquote>
+<p>文件权限：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">查看文件权限：ls <span class="_">-l</span></div></pre></td></tr></table></figure>
+<p><img src="/img/linux/right1.png" alt="权限说明1"><br><img src="/img/linux/right2.png" alt="权限说明2"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">更改所有者：chown</div><div class="line">更改文件权限：chmod (直接赋值和加减权限)</div><div class="line">chmod go-rw hci</div><div class="line"><span class="comment"># 'g''o'还有'u'，分别表示group，others，user，'+'，'-' 就分别表示增加和去掉相应的权限</span></div></pre></td></tr></table></figure>
+<p><img src="/img/linux/right3.png" alt="权限说明3"><br>[ps: 三组权限：拥有者、所属用户组、其他用户]</p>
+<blockquote>
+<p>操作文件：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">切换目录：<span class="built_in">cd</span>\<span class="built_in">pushd</span></div><div class="line">新建文件：touch</div><div class="line">新建目录：mkdir</div><div class="line">查看目录：ls</div><div class="line">删除文件、目录：rm\rm -rf</div><div class="line">复制文件：cp</div><div class="line">移动文件：mv</div><div class="line">重命名：rename</div><div class="line">查看文件：cat\tac\ln</div><div class="line">查看文件首尾：head\tail</div><div class="line">逐行显示：more\less</div><div class="line">查看文件类型：file</div></pre></td></tr></table></figure>
+<ul>
+<li><p>文本处理<br>主要工具vi\vim：屏幕编辑和行编辑模式</p>
+</li>
+<li><p>环境变量<br>运行环境的变量。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">定义变量：<span class="built_in">declare</span></div><div class="line">删除变量：<span class="built_in">unset</span></div><div class="line">立即生效：<span class="built_in">source</span> .bashrc</div><div class="line">用户Bash环境变量文件：~/.bashrc(根据终端环境如zsh的.zshrc)</div><div class="line">系统环境变量：/etc/profile(/etc/bashrc)</div></pre></td></tr></table></figure>
+</li>
+<li><p>其他技巧</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">回显筛选：grep</div><div class="line">查找文件：<span class="built_in">where</span>(qs)\locate(qm)\whic(sr)\find</div><div class="line">查看进程：ps</div><div class="line">任务管理器：top</div><div class="line">重启：reboot</div><div class="line">关机：poweroff\shutdown\init</div><div class="line">创建归档：tar(-c -x)</div><div class="line">下载文件：wget</div><div class="line">挂载文件系统：mount\unmount</div><div class="line">帮助文档：man\info</div></pre></td></tr></table></figure>
+</li>
+</ul>
