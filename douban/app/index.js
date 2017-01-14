@@ -32,11 +32,12 @@ const startPage = (url) => superagent.get(url).end(
       movieList.push(info)
 
       // 展示简要信息
-      console.log(JSON.stringify(info, null, 2))
+      // console.log(JSON.stringify(info, null, 2))
     }
-    id++
+    console.log(JSON.stringify(movieList, null, 4))
 
     // 抓取250条信息 每页25条
+    id++
     if (id < 10) {
       fetchPage(nextLink)
     }
