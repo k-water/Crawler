@@ -12,6 +12,9 @@
     "type": "git",
     "url": "git+https://github.com/scauhci/single_crawler.git"
   },
+  "keywords": [
+    "spider"
+  ],
   "author": "water",
   "license": "ISC",
   "devDependencies": {

@@ -1,8 +1,6 @@
-const http = require('http')
 const superagent = require('superagent')
-const fs = require('fs')
 const cheerio = require('cheerio')
-
+const storage = require('./storage.js')
 const targetUrl = 'https://movie.douban.com/top250'
 let id = 0
 let num = 0
@@ -16,6 +14,7 @@ const startPage = (url) => superagent.get(url).end(
     let movieList = []
     let $ = cheerio.load(res.text, { decodeEntities: false })
     let nextLink = 'https://movie.douban.com/top250' + $('span.next a').attr('href')
+    let page = $('.paginator .thispage').text()
     for (let i = 0; i < 25; i++) {
       let tmp = $('.grid_view li').eq(i).children().children().next()
       let starring = tmp.find('div.bd p').eq(0).text().trim().split('&nbsp')[3].trim().split(':')[1]
@@ -34,9 +33,9 @@ const startPage = (url) => superagent.get(url).end(
       // 展示简要信息
       // console.log(JSON.stringify(info, null, 2))
     }
-    console.log(JSON.stringify(movieList, null, 4))
-
-    // 抓取250条信息 每页25条
+    // console.log(JSON.stringify(movieList, null, 4))
+    storage.saveData('./app/data/', page, movieList)
+      // 抓取250条信息 每页25条
     id++
     if (id < 10) {
       fetchPage(nextLink)
