@@ -17,12 +17,18 @@ const saveData = (path, page, movieList) => {
   })
 }
 
+/**
+ * @param {string} path
+ * @param {string} url
+ * @param {string} fileName
+ */
 const saveImages = (path, url, fileName) => {
   request.head(url, (err, res, body) => {
     if (err) {
       return console.log(err)
     }
     request(url).pipe(fs.createWriteStream(path + fileName + '.jpg'))
+    console.log('Image Saved')
   })
 }
 exports.saveData = saveData
