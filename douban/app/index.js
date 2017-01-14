@@ -1,6 +1,7 @@
 const superagent = require('superagent')
 const cheerio = require('cheerio')
 const storage = require('./storage.js')
+
 const targetUrl = 'https://movie.douban.com/top250'
 let id = 0
 let num = 0
@@ -30,10 +31,14 @@ const startPage = (url) => superagent.get(url).end(
       }
       movieList.push(info)
 
-      // 展示简要信息
-      // console.log(JSON.stringify(info, null, 2))
+      // 保存图片
+      storage.saveImages('./app/images/', info.image, info.movieName)
+        // 展示简要信息
+        // console.log(JSON.stringify(info, null, 2))
     }
     // console.log(JSON.stringify(movieList, null, 4))
+
+    // 保存电影信息
     storage.saveData('./app/data/', page, movieList)
       // 抓取250条信息 每页25条
     id++
