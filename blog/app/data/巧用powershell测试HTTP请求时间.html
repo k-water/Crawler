@@ -17,4 +17,23 @@
 </li>
 <li><p>COM组件”InternetExplorer.Application”</p>
 </li>
+</ul><h4 id="1、使用基本的cmdlet"><a href="#1、使用基本的cmdlet" class="headerlink" title="1、使用基本的cmdlet"></a>1、使用基本的cmdlet</h4><ul>
+<li>Invoke-WebRequest进行HTTP请求测试</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 关于Invoke-WebRequest基本用法</span></div><div class="line">PS &gt; Invoke-WebRequest -Uri <span class="string">"http://www.baidu.com"</span></div></pre></td></tr></table></figure>
+<a id="more"></a>
+<ul>
+<li>Measure-Command对上面的命令进行”计时”</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PS &gt; Measure-Command -Expression &#123;Invoke-WebRequest -Uri <span class="string">"http://www.baidu.com"</span>&#125;</div></pre></td></tr></table></figure>
+<!--more-->
+<h4 id="2、源代码："><a href="#2、源代码：" class="headerlink" title="2、源代码："></a>2、源代码：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$url</span> = <span class="string">"http://www.baidu.com"</span></div><div class="line"><span class="comment"># 追踪执行命令耗时</span></div><div class="line"><span class="variable">$timeTaken</span> = Measure-Command -Expression &#123;</div><div class="line">  <span class="comment"># 保留请求信息，可用于网络爬虫的实现</span></div><div class="line">  <span class="variable">$site</span> = Invoke-WebRequest -Uri <span class="variable">$url</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment"># 获取毫秒数</span></div><div class="line"><span class="variable">$milliseconds</span> = <span class="variable">$timeTaken</span>.TotalMilliseconds</div><div class="line"><span class="variable">$milliseconds</span> = [Math]::Round(<span class="variable">$milliseconds</span>, 1)</div><div class="line"></div><div class="line">Write-Host <span class="string">"It took <span class="variable">$milliseconds</span> ms!"</span></div></pre></td></tr></table></figure>
+<h4 id="3、小结"><a href="#3、小结" class="headerlink" title="3、小结"></a>3、小结</h4><p>PowerShell获取网页信息个人建议的三种解决方案：</p>
+<ul>
+<li><p>WebClient</p>
+</li>
+<li><p>Invoke-WebRequest</p>
+</li>
+<li><p>COM组件”InternetExplorer.Application”</p>
+</li>
 </ul>

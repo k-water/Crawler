@@ -1,9 +1,20 @@
 /**
  * Storage.js
  */
-var http = require('http')
-var https = require('https')
 var fs = require('fs')
+var request = require('request')
+
+function saveImages(path, url, fileName) {
+  var subStr = url.substr(url.length - 4)
+  request.head(url, function (err, res, body) {
+    if (err) {
+      return console.log(err)
+    }
+    request(url).pipe(fs.createWriteStream(path + fileName + subStr))
+    console.log('Image Saved')
+  })
+}
+exports.saveImages = saveImages
 
 function savedContent($, articlesTitle) {
   var text = $('.article-entry').html().trim()
@@ -15,49 +26,4 @@ function savedContent($, articlesTitle) {
   })
 }
 
-function savedImgForHttp(url, index) {
-  var subStr = url.substr(url.length - 4)
-  http.get(url, function (res) {
-    var data = ''
-    res.setEncoding('binary')
-
-    res.on('data', function (chunk) {
-      data += chunk
-    })
-    res.on('end', function () {
-      fs.appendFile('./app/images/' + index + subStr, data, 'binary', function (err) {
-        if (err) {
-          console.log(err)
-        }
-        console.log('pic保存完成')
-      })
-    })
-  }).on('error', function (err) {
-    console.log(err)
-  })
-}
-
-function savedImgForHttps(url, index) {
-  var subStr = url.substr(url.length - 4)
-  https.get(url, function (res) {
-    var data = ''
-    res.setEncoding('binary')
-
-    res.on('data', function (chunk) {
-      data += chunk
-    })
-    res.on('end', function () {
-      fs.appendFile('./app/images/' + index + subStr, data, 'binary', function (err) {
-        if (err) {
-          console.log(err)
-        }
-        console.log('pic保存完成')
-      })
-    })
-  }).on('error', function (err) {
-    console.log(err)
-  })
-}
 exports.savedContent = savedContent
-exports.savedImgForHttp = savedImgForHttp
-exports.savedImgForHttps = savedImgForHttps

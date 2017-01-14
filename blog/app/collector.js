@@ -34,7 +34,7 @@ function startRequest(x) {
       var arrPic = []
       // 正则匹配url
       var reg = /^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+/
-      var regHttps = /^((https)?:\/\/)[^\s]+/
+      // var regHttps = /^((https)?:\/\/)[^\s]+/
       $('.body-wrap img').each(function () {
         var that = $(this)
         var src = that.attr('src')
@@ -61,11 +61,7 @@ function startRequest(x) {
       storage.savedContent($, articlesTitle)
       var nameImg = 0
       for (var i = 0, len = arrPic.length; i < len; i++) {
-        if (regHttps.test(arrPic[i])) {
-          storage.savedImgForHttps(arrPic[i], nameImg++)
-        } else {
-          storage.savedImgForHttp(arrPic[i], nameImg++)
-        }
+        storage.saveImages('./app/images/', arrPic[i], ++nameImg)
       }
 
       // 下一篇文章的链接
