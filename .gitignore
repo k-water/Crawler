@@ -38,3 +38,8 @@ jspm_packages
 
 # crawler result
 *.html
+*.png
+*.jpg
+blog/app/data/*.html
+blog/app/images/*.jpg
+blog/app/images/*.png

@@ -3,6 +3,7 @@
  */
 var fs = require('fs')
 var request = require('request')
+var https = require('https')
 
 function saveImages(path, url, fileName) {
   var subStr = url.substr(url.length - 4)
@@ -11,10 +12,8 @@ function saveImages(path, url, fileName) {
       return console.log(err)
     }
     request(url).pipe(fs.createWriteStream(path + fileName + subStr))
-    console.log('Image Saved')
   })
 }
-exports.saveImages = saveImages
 
 function savedContent($, articlesTitle) {
   var text = $('.article-entry').html().trim()
@@ -22,8 +21,29 @@ function savedContent($, articlesTitle) {
     if (err) {
       console.log(err)
     }
-    console.log('保存完成')
   })
 }
 
+function saveImagesHttps(path, url, fileName) {  
+  var subStr = url.substr(url.length - 4)
+  https.get(url, function (res) {
+    var data = ''
+    res.setEncoding('binary')
+
+    res.on('data', function (chunk) {
+      data += chunk
+    })
+    res.on('end', function () {
+      fs.appendFile(path + fileName + subStr, data, 'binary', function (err) {
+        if (err) {
+          console.log(err)
+        }
+      })
+    })
+  }).on('error', function (err) {
+    console.log(err)
+  })
+}
 exports.savedContent = savedContent
+exports.saveImages = saveImages
+exports.saveImagesHttps = saveImagesHttps
