@@ -37,9 +37,5 @@ jspm_packages
 .node_repl_history
 
 # crawler result
-*.html
-*.png
-*.jpg
-blog/app/data/*.html
-blog/app/images/*.jpg
-blog/app/images/*.png
+blog/app/data
+blog/app/images
