@@ -1,0 +1,20 @@
+{
+  "name": "wallpaper",
+  "version": "1.0.0",
+  "description": "wallpaper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./app/index.js"
+  },
+  "keywords": [
+    "wallpaper"
+  ],
+  "author": "water",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "request": "^2.79.0",
+    "superagent": "^3.3.2"
+  }
+}
